@@ -1,41 +1,37 @@
-import express, { NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { get, merge } from 'lodash';
-import { getUserBySessionToken } from 'db/users';
+import { userBySessionToken } from '../usecases/user';
+import asyncHandler from './async';
 
-export const isAuthenticated = async (req:express.Request, res:express.Response, next:express.NextFunction) => {
+export const isAuthenticated = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const sessionToken = req.cookies('token');
-
-    if(!sessionToken) {
+    const sessionToken = req.cookies['token']; // Correct usage
+    if (!sessionToken) {
       return res.sendStatus(403);
     }
-
-    const existingUser = await getUserBySessionToken(sessionToken);
-
+    const existingUser = await userBySessionToken(sessionToken);
     if (!existingUser) {
       return res.sendStatus(403);
     }
-
     merge(req, { identity: existingUser });
-
-    return next()
+    return next();
   } catch (error) {
     console.log(error);
     return res.sendStatus(400);
   }
-}
+});
 
-export const isOwner = async (req:Request, res:Response, next:NextFunction) => {
+// Middleware to verify ownership
+export const isOwner = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
-    const currentUserId = get(req, 'identity._id') as string;
-
-    if (!currentUserId) {
+    const currentUserId = get(req, 'identity._id', '') as string;
+    if (!currentUserId || currentUserId.toString() !== id) {
       return res.sendStatus(403);
     }
-
+    next(); // Ensure to call next to pass control to the next middleware
   } catch (error) {
     console.log(error);
     return res.sendStatus(400);
   }
-}
+});
