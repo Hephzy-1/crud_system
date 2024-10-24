@@ -1,52 +1,39 @@
 import { Request, Response } from "express";
-import { deleteUser, fetchUser, userById } from "../usecases/user";
+import { User } from "../usecases/user";
 import asyncHandler from '../middlewares/async';
+import { ErrorResponse } from "../utils/errorResponse";
 
 export const getAllUsers = asyncHandler(async (req:Request, res:Response) => {
-  try {
-    const user = await fetchUser();
 
-    return res.status(200).json(user);
-  } catch (error) {
-    console.log(error);
-    return res.sendStatus(400);
-  }
+  const user = await User.fetchUsers();
+
+  return res.status(200).json({ message: "Here is all the users:", user });
 });
 
 export const deletedUser = asyncHandler(async (req:Request, res:Response) => {
-  try {
-    const { id } = req.params;
+  const { id } = req.params;
 
-    const deleteAUser = await deleteUser(id);
+  const deleteAUser = await User.deleteUser(id);
 
-    return res.json(deleteAUser)
-  } catch (error) {
-    console.log(error);
-    return res.sendStatus(400);
-  }
+  return res.status(200).json({ messgae: "User has been deletes",deleteAUser })
 })
 
 export const updateUser = asyncHandler(async (req:Request, res:Response) => {
-  try {
-    const { id } = req.params;
-    const { username } = req.body;
+  const { id } = req.params;
+  const { username } = req.body;
 
-    if(!id || !username) {
-      return res.sendStatus(400)
-    }
-
-    const user = await userById(id)
-
-    if (!user) {
-      return res.sendStatus(400);
-    }
-
-    user.username = username
-    await user.save();
-
-    return res.status(200).json(user).end();
-  } catch (error) {
-    console.log(error);
-    return res.sendStatus(400);
+  if(!id || !username) {
+    throw new ErrorResponse("Id and username is required", 400);
   }
+
+  const user = await User.userById(id)
+
+  if (!user) {
+    throw new ErrorResponse("User cannot be found", 404);
+  }
+
+  user.username = username
+  await user.save();
+
+  return res.status(200).json({ message: "User has been updated",user });
 })

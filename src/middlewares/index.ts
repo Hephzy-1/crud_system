@@ -1,23 +1,25 @@
 import { Request, Response, NextFunction } from 'express';
 import { get, merge } from 'lodash';
-import { userBySessionToken } from '../usecases/user';
+import { User } from '../usecases/user';
 import asyncHandler from './async';
+import { ErrorResponse } from '../utils/errorResponse';
 
 export const isAuthenticated = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
   try {
     const sessionToken = req.cookies['token']; // Correct usage
     if (!sessionToken) {
-      return res.sendStatus(403);
+      throw new ErrorResponse("Session Token is missing", 403);
     }
-    const existingUser = await userBySessionToken(sessionToken);
+    const existingUser = await User.userBySessionToken(sessionToken);
     if (!existingUser) {
-      return res.sendStatus(403);
+      throw new ErrorResponse("No user with this session token", 404);
     }
     merge(req, { identity: existingUser });
     return next();
-  } catch (error) {
+  } catch (error:any) {
     console.log(error);
-    return res.sendStatus(400);
+    throw new ErrorResponse(error.message, 500);
+    ;
   }
 });
 
@@ -27,11 +29,11 @@ export const isOwner = asyncHandler(async (req: Request, res: Response, next: Ne
     const { id } = req.params;
     const currentUserId = get(req, 'identity._id', '') as string;
     if (!currentUserId || currentUserId.toString() !== id) {
-      return res.sendStatus(403);
+      throw new ErrorResponse("User doesn't own the account", 403);
     }
     next(); // Ensure to call next to pass control to the next middleware
-  } catch (error) {
+  } catch (error:any) {
     console.log(error);
-    return res.sendStatus(400);
+    throw new ErrorResponse(error.message, 500);
   }
 });

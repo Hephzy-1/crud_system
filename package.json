@@ -2,7 +2,7 @@
   "name": "typescript",
   "version": "1.0.0",
   "scripts": {
-    "start": "node src/server.ts",
+    "start": "ts node src/server.ts",
     "dev": "nodemon src/server.ts"
   },
   "keywords": [],
@@ -28,6 +28,7 @@
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
-    "express": "^4.21.1"
+    "express": "^4.21.1",
+    "joi": "^17.13.3"
   }
 }

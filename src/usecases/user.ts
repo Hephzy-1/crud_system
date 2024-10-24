@@ -1,42 +1,68 @@
-import { createUser, deleteUserById, getUser, getUserByEmail, getUserById, getUserBySessionToken, updateUser } from '../repository/user';
+import { UserRepository } from '../repository/user';
 import { IUser } from '../models/users';
+import { ErrorResponse } from '../utils/errorResponse';
 
-export const registerUser = async (user: IUser): Promise<IUser> => {
-  try {
-    return await createUser(user);
-  } catch (error: any) {
-    throw new Error(error.message);
+export class User {
+  // create a new user
+  static async create(user:IUser) {
+    try {
+      return await UserRepository.createUser(user);
+    } catch (error: any) {
+      throw new ErrorResponse(error.message, 500);
+    }
+  }
+
+  // get a user by email
+  static async userByEmail(email:string) {
+    try {
+      return await UserRepository.getUserByEmail(email);
+    } catch (error: any) {
+      throw new ErrorResponse(error.message, 500);
+    }
+  }
+
+  // get user by session token
+  static async userBySessionToken(session:string) {
+    try {
+      return await UserRepository.getUserBySessionToken(session);
+    } catch (error: any) {
+      throw new ErrorResponse(error.message, 500);
+    }
+  }
+
+  // get all users
+  static async fetchUsers() {
+    try {
+      return await UserRepository.getUsers();
+    } catch (error: any) {
+      throw new ErrorResponse(error.message, 500);
+    }
+  }
+
+  // delete a user
+  static async deleteUser(id:string) {
+    try {
+      return await UserRepository.deleteUser(id);
+    } catch (error: any) {
+      throw new ErrorResponse(error.message, 500);
+    }
+  }
+
+  // update a user
+  static async update(id:string, update: IUser) {
+    try {
+      return await UserRepository.updateUser(id, update);
+    } catch (error: any) {
+      throw new ErrorResponse(error.message, 500);
+    }
+  }
+
+  // get a user by id
+  static async userById(id:string) {
+    try {
+      return await UserRepository.getUserById(id);
+    } catch (error: any) {
+      throw new ErrorResponse(error.message, 500);
+    }
   }
 };
-
-export const userByEmail = (email: string) => {
-  return getUserByEmail(email);
-};
-
-export const userBySessionToken = async (session: string) => {
-  return await getUserBySessionToken(session)
-}
-
-export const fetchUser = async () => {
-  return await getUser()
-}
-
-export const deleteUser = async (id:string) => {
-  return await deleteUserById(id)
-}
-
-export const update = async (id:string, update:IUser) => {
-  try {
-    return await updateUser(id, update)
-  } catch (error:any) {
-    throw new Error(error.message)
-  }
-}
-
-export const userById = async(id:string) => {
-  try {
-    return await getUserById(id)
-  } catch (error:any) {
-    throw new Error(error.message)
-  }
-}
