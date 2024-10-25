@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 export interface IUser extends mongoose.Document {
   username: string,
   email: string,
+  role: string,
   authentication: {
     password: string,
     salt?: string,
@@ -14,6 +15,7 @@ export interface IUser extends mongoose.Document {
 const userSchema = new mongoose.Schema<IUser>({
   username: { type: String, required: true },
   email: { type: String, required: true },
+  role: { type: String, enum: ['user', 'admin'], default: 'user' },
   authentication: {
     password: { type: String, required: true, select: false },
     salt: { type: String, select: false},

@@ -6,7 +6,7 @@ const server = http.createServer(app);
 const PORT = process.env.PORT || 3000;
 
 // connect Database
-// connectDB();
+connectDB();
 
 server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

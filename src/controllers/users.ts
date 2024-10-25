@@ -3,13 +3,6 @@ import { User } from "../usecases/user";
 import asyncHandler from '../middlewares/async';
 import { ErrorResponse } from "../utils/errorResponse";
 
-export const getAllUsers = asyncHandler(async (req:Request, res:Response) => {
-
-  const user = await User.fetchUsers();
-
-  return res.status(200).json({ message: "Here is all the users:", user });
-});
-
 export const deletedUser = asyncHandler(async (req:Request, res:Response) => {
   const { id } = req.params;
 

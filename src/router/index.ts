@@ -1,7 +1,8 @@
 import express from 'express';
 import { register, login } from '../controllers/auth';
 import { isAuthenticated, isOwner } from '../middlewares/index';
-import { getAllUsers, deletedUser, updateUser } from '../controllers/users';
+import { deletedUser, updateUser } from '../controllers/users';
+import { getAllUsers } from '../controllers/admin';
 
 const router = express.Router();
 

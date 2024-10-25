@@ -7,7 +7,7 @@ import compression from 'compression';
 import mongoose from 'mongoose';
 import router from './router/index';
 import asyncHandler from './middlewares/async';
-import { errorHandler } from './middlewares/error';
+import errorHandler from './middlewares/error';
 
 const app: Application = express();
 
