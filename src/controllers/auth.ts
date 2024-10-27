@@ -8,6 +8,8 @@ import { loginUser, registerUser } from '../validators/user';
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
 
+  console.log(req.body)
+
   const { error, value } = registerUser.validate(req.body);
 
   if (error) {
@@ -18,6 +20,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
   
   const existingUser = await User.userByEmail(email);
   if (existingUser) {
+    console.log("User already exists")
     throw new ErrorResponse("User already exists", 400);
     ;
   }
@@ -45,18 +48,18 @@ export const login = asyncHandler(async (req: Request, res: Response)=> {
   }
 
   // Authenticate user
-  const expectHash = authentication(user.authentication.salt ?? "", password);
+  const expectHash = authentication(user.salt ?? "", password);
   if (!expectHash) {
     throw new ErrorResponse("Password is incorrect", 400);
   }
 
   // Update session token and save user
   const salt = random();
-  user.authentication.sessionToken = authentication(salt, user._id.toString());
+  user.sessionToken = authentication(salt, user._id.toString());
   await user.save();
 
   // Set cookie and return response
-  res.cookie("token", user.authentication.sessionToken, {
+  res.cookie("token", user.sessionToken, {
     domain: "localhost",
     path: "/",
   });

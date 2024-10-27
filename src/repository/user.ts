@@ -4,15 +4,22 @@ import { IUser } from '../models/users';
 
 export class UserRepository {
   // create a new user
-  static async createUser(values:IUser) {
+  static async createUser(values: IUser) {
     try {
-      const user = await new User(values).save();
+      const user = await new User({
+        username: values.username,
+        email: values.email,
+        role: values.role,
+        password: values.password,
+        salt: values.salt,
+        sessionToken: values.sessionToken
+      }).save();
       return user.toObject();
-
-    } catch (error:any) {
-      throw new ErrorResponse(error.message, 500)
+    } catch (error: any) {
+      throw new ErrorResponse(error.message, 500);
     }
   }
+  
 
   // get all users
   static async getUsers() {
@@ -26,16 +33,16 @@ export class UserRepository {
   // get a user by email
   static async getUserByEmail(email:string) {
     try {
-      return await User.findOne({ email }).select('+authentication.salt +authentication.password')
+      return await User.findOne({ email }).select('+salt +password')
     } catch (error:any) {
       throw new ErrorResponse(error.message, 500)
     }
   }
 
   // get user by user session token
-  static async getUserBySessionToken(sessionToken: string) {
+  static async getUserBySessionToken(sessionToken: string): Promise<IUser | null> {
     try {
-      return await User.findOne({ 'authentication.sessionToken': sessionToken })
+      return await User.findOne({ sessionToken : sessionToken })
     } catch (error:any) {
       throw new ErrorResponse(error.message, 500)
     }
