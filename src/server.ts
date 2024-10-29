@@ -1,4 +1,4 @@
-import app from './index';
+import app from './app';
 import connectDB from './config/db';
 import http from 'http';
 

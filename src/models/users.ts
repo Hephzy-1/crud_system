@@ -1,4 +1,4 @@
-import mongoose, { Document } from "mongoose";
+import mongoose, { Document, Types } from "mongoose";
 
 export interface IUser extends Document {
   username: string;
@@ -8,6 +8,7 @@ export interface IUser extends Document {
   salt?: string;
   sessionToken?: string;
   _id: string;
+  post: Types.ObjectId[];
 }
 
 const userSchema = new mongoose.Schema<IUser>({
@@ -17,6 +18,9 @@ const userSchema = new mongoose.Schema<IUser>({
   password: { type: String, required: true, select: false },
   salt: { type: String, select: false },
   sessionToken: { type: String, select: false },
+  post: [
+    { type: Types.ObjectId, ref: 'post' }
+  ]
 });
 
 const User = mongoose.model<IUser>('User', userSchema);

@@ -26,7 +26,7 @@ export class UserRepository {
     try {
       return await User.find().exec()
     } catch (error:any) {
-      throw new ErrorResponse(error.message, 500)
+      throw new ErrorResponse(error.message, 500);
     }
   }
 
@@ -60,16 +60,32 @@ export class UserRepository {
   // update user details
   static async updateUser(id: string, update: Partial<IUser>) {
     try {
-
-      if (User.findById(id) === null) {
-        throw new ErrorResponse("User not found", 404)
+      const user = await User.findById(id);
+      if (!user) {
+        throw new ErrorResponse("User not found", 404);
       }
-
-      return await User.findOneAndUpdate({id}, update, { new: true }).exec()
-    } catch (error:any) {
-      throw new ErrorResponse(error.message, 500)
+      return await User.findByIdAndUpdate(id, update, { new: true }).exec();
+    } catch (error: any) {
+      throw new ErrorResponse(error.message, 500);
     }
-  }
+  }  
+
+  // add post id to user
+  static async updateUserPost(id: string, postId: string) {
+    try {
+      const user = await User.findById(id);
+      if (!user) {
+        throw new ErrorResponse("User not found", 404);
+      }
+  
+      // Add the new post ID to the user's post array
+      user.post.push(postId);
+  
+      return await user.save();
+    } catch (error: any) {
+      throw new ErrorResponse(error.message, 500);
+    }
+  }  
 
   // delete a user
   static async deleteUser(id: string) {

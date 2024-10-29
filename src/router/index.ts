@@ -2,6 +2,7 @@ import express from 'express';
 import { register, login } from '../controllers/auth';
 import { isAdmin, isAuthenticated, isOwner } from '../middlewares/index';
 import { getAllUsers, deletedUser, updateUser, deletedAccount } from '../controllers/users';
+import { createPost } from '../controllers/posts';
 
 const router = express.Router();
 
@@ -11,6 +12,7 @@ router.get('/admin/get-users', isAuthenticated, isAdmin, getAllUsers);
 router.delete('/users/:id', isAuthenticated, isOwner, deletedUser);
 router.delete('/admin/:id', isAuthenticated, isAdmin, deletedAccount);
 router.patch('/users/:id', isAuthenticated, isOwner, updateUser)
+router.post('/post', isAuthenticated, isOwner, createPost)
 
 export default router;
 

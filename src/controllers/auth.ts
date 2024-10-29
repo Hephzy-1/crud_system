@@ -25,7 +25,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
     ;
   }
   // const salt = random();
-  const user = await User.create(req.body);
+  const user = await User.create(value);
   return res.status(201).json(user);
 
 });
