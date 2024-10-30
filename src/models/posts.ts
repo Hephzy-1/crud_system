@@ -1,12 +1,12 @@
-import { Document, Schema, Model, Types } from 'mongoose';
+import { Document, Schema, model, Types } from 'mongoose';
 
 export interface IPost extends Document {
   title: string;
   post: string;
-  userId: Tpes.ObjectId;
+  userId: Types.ObjectId;
 }
 
-const postModel = Schema<IPost>({
+const postModel = new Schema<IPost>({
   title: {
     type: String,
     required: true
@@ -15,7 +15,7 @@ const postModel = Schema<IPost>({
     type: String,
     required: true
   },
-  userId: { type: Types.ObjectId, required: true, ref: 'user'}
+  userId: { type: Schema.Types.ObjectId, required: true, ref: 'user'}
 });
 
 const Post = model<IPost>('Post', postModel);

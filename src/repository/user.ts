@@ -1,6 +1,7 @@
 import { ErrorResponse } from '../utils/errorResponse';
 import User from '../models/users';
 import { IUser } from '../models/users';
+import { Types } from 'mongoose';
 
 export class UserRepository {
   // create a new user
@@ -71,7 +72,7 @@ export class UserRepository {
   }  
 
   // add post id to user
-  static async updateUserPost(id: string, postId: string) {
+  static async updateUserPost(id: Types.ObjectId, postId: string) {
     try {
       const user = await User.findById(id);
       if (!user) {
@@ -79,9 +80,9 @@ export class UserRepository {
       }
   
       // Add the new post ID to the user's post array
-      user.post.push(postId);
+      const pushPost = await user.updateOne({ post: postId});
   
-      return await user.save();
+      return pushPost;
     } catch (error: any) {
       throw new ErrorResponse(error.message, 500);
     }

@@ -18,7 +18,7 @@ export class PostRepository {
   // get all posts
   static async getPosts () {
     try {
-      return await new Post.find().exec();
+      return await Post.find().exec();
     } catch (error:any) {
       throw new ErrorResponse(error.message, 500);
     }

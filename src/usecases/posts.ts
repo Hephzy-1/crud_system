@@ -19,7 +19,7 @@ export class Post {
       // create the post with the user ids
       post.userId = userId;
       const newPost = await PostRepository.createPost(post);
-      await UserRepository.updateUserPost(userId.toString(), newPost._id as unknown as string);
+      await UserRepository.updateUserPost(userId, newPost._id as unknown as string);
   
       return newPost;
     } catch (error: any) {
@@ -40,6 +40,7 @@ export class Post {
   // get all posts by a specific user
   static async postByUserId(userId: string) {
     try {
+      const userObject = new Types.ObjectId(userId)
       return await PostRepository.getPostByUserId(userId);
     } catch (error: any) {
       throw new ErrorResponse(error.message, 500);
