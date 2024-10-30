@@ -27,7 +27,10 @@ export class PostRepository {
   // get all posts by a specific user
   static async getPostByUserId (userId: string) {
     try {
-      return await Post.find({userId})
+      const user = await Post.find({ userId: userId}).populate('userId');
+
+      console.log(user)
+      return user;
     } catch (error: any) {
       throw new ErrorResponse(error.message, 500);
     }

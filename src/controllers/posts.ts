@@ -4,7 +4,7 @@ import { User } from "../usecases/user";
 import asyncHandler from '../middlewares/async';
 import { IPost } from "../models/posts";
 import { ErrorResponse } from "../utils/errorResponse";
-import { makePost } from "../validators/post";
+import { makePost, userPost } from "../validators/post";
 
 export const createPost = asyncHandler(async (req: Request, res: Response) => {
   req.body.userId = req.user?._id;
@@ -18,7 +18,6 @@ export const createPost = asyncHandler(async (req: Request, res: Response) => {
   const { title, post } = value;
 
   value.userId = req.body.userId
-  console.log(value)
 
   const user = User.userById(value.userId)
 
@@ -29,3 +28,34 @@ export const createPost = asyncHandler(async (req: Request, res: Response) => {
   const blog = await Post.create(value);
   return res.status(201).json({ Message: "Post has been created: ", blog})
 });
+
+export const getPostsByUserId = asyncHandler(async (req: Request, res: Response) => {
+  try {
+
+    const { error, value } = userPost.validate(req.params);
+
+    if (error) {
+      throw new ErrorResponse("User ID is required", 400);
+    }
+
+    const { id } = value;
+
+    const post = await Post.postByUserId(id)
+    if (!post) {
+      throw new ErrorResponse("Post not found", 404);
+    }
+    res.status(200).json({ post });
+  } catch (error:any) {
+    throw new ErrorResponse(error.message, 500);
+  }
+});
+
+export const getPosts = asyncHandler(async (req: Request, res: Response) => {
+  try { 
+    const post = await Post.getPosts();
+
+    return res.status(200).json({ message: "Here is all the posts:", post })
+  } catch (error:any) {
+    throw new ErrorResponse(error.message, 500)
+  }
+})

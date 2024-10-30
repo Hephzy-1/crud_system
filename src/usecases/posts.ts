@@ -40,7 +40,6 @@ export class Post {
   // get all posts by a specific user
   static async postByUserId(userId: string) {
     try {
-      const userObject = new Types.ObjectId(userId)
       return await PostRepository.getPostByUserId(userId);
     } catch (error: any) {
       throw new ErrorResponse(error.message, 500);
