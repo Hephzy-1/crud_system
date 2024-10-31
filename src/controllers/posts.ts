@@ -4,7 +4,7 @@ import { User } from "../usecases/user";
 import asyncHandler from '../middlewares/async';
 import { IPost } from "../models/posts";
 import { ErrorResponse } from "../utils/errorResponse";
-import { makePost, userPost } from "../validators/post";
+import { makePost, userPost, updatePost } from "../validators/post";
 
 export const createPost = asyncHandler(async (req: Request, res: Response) => {
   req.body.userId = req.user?._id;
@@ -56,6 +56,37 @@ export const getPosts = asyncHandler(async (req: Request, res: Response) => {
 
     return res.status(200).json({ message: "Here is all the posts:", post })
   } catch (error:any) {
+    throw new ErrorResponse(error.message, 500)
+  }
+});
+
+export const update = asyncHandler(async (req:Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { error, value } = updatePost.validate(req.body)
+
+    if (error) {
+      throw new ErrorResponse("post update is required", 400);
+    }
+
+    const { update } = value;
+
+    const pushUpdate = await Post.update(id, update)
+
+    return res.status(200).json({ message: "Post has been updated", post: pushUpdate });
+  } catch (error: any) {
+    throw new ErrorResponse(error.message, 500);
+  }
+});
+
+export const deletePost = asyncHandler(async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const deleted = await Post.delete(id)
+
+    return res.status(200).json({ message: "Successfully deleted post", success: deleted})
+  } catch (error: any) {
     throw new ErrorResponse(error.message, 500)
   }
 })

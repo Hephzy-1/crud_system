@@ -27,7 +27,7 @@ export class PostRepository {
   // get all posts by a specific user
   static async getPostByUserId (userId: string) {
     try {
-      const user = await Post.find({ userId: userId}).populate('userId');
+      const user = await Post.find({ userId: userId})  //.populate('userId');
 
       console.log(user)
       return user;
@@ -49,7 +49,7 @@ export class PostRepository {
   static async updatePost (id: string, update: Partial<IPost>) {
     try {
       if (Post.findById(id) === null) {
-        throw new ErrorResponse("Post not found", 500);
+        throw new ErrorResponse("Post not found", 404);
       }
 
       return await Post.findOneAndUpdate({id}, update, { new: true }).exec();

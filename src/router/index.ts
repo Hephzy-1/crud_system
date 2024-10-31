@@ -2,7 +2,7 @@ import express from 'express';
 import { register, login } from '../controllers/auth';
 import { isAdmin, isAuthenticated, isOwner } from '../middlewares/index';
 import { getAllUsers, deletedUser, updateUser, deletedAccount } from '../controllers/users';
-import { createPost, getPostsByUserId, getPosts } from '../controllers/posts';
+import { createPost, getPostsByUserId, getPosts, deletePost } from '../controllers/posts';
 
 const router = express.Router();
 
@@ -15,6 +15,8 @@ router.patch('/users/:id', isAuthenticated, isOwner, updateUser);
 router.post('/users/:id/post', isAuthenticated, isOwner, createPost);
 router.get('/users/:id/post', isAuthenticated, getPostsByUserId);
 router.get('/users/posts', isAuthenticated, getPosts);
+router.delete('/users/:id/posts', isAuthenticated, isOwner, deletePost);
+router.delete('/admin/:id/posts', isAuthenticated, isAdmin, deletePost);
 
 export default router;
 

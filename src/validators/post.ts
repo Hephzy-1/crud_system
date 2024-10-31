@@ -8,4 +8,8 @@ export const makePost = Joi.object({
 
 export const userPost = Joi.object({
   id: Joi.string().alphanum()
+});
+
+export const updatePost = Joi.object({
+  post: Joi.string().min(20).message("Post must be at least 20 characters").required()
 })
