@@ -8,7 +8,7 @@ export class Post {
   // create a new post
   static async create(post: IPost): Promise<IPost> {
     try {
-      let userId: Types.ObjectId = new Types.ObjectId(post.userId);
+      let userId: Types.ObjectId = post.userId;
   
       // If no userId is found
       if (!userId) {

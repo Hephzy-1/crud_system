@@ -3,6 +3,7 @@ import { register, login } from '../controllers/auth';
 import { isAdmin, isAuthenticated, isOwner } from '../middlewares/index';
 import { getAllUsers, deletedUser, updateUser, deletedAccount } from '../controllers/users';
 import { createPost, getPostsByUserId, getPosts, update, deletePost } from '../controllers/posts';
+import upload from '../utils/multer';
 
 const router = express.Router();
 
@@ -13,7 +14,7 @@ router.delete('/users/:id', isAuthenticated, isOwner, deletedUser);
 router.delete('/admin/:id', isAuthenticated, isAdmin, deletedAccount);
 router.patch('/users/:id', isAuthenticated, isOwner, updateUser);
 
-router.post('/users/:id/post', isAuthenticated, isOwner, createPost);
+router.post('/users/:id/post', isAuthenticated, isOwner, upload.single('coverImage'), createPost);
 router.get('/users/:id/post', isAuthenticated, getPostsByUserId);
 router.get('/users/posts', isAuthenticated, getPosts);
 router.put('/users/:id/posts', isAuthenticated, isOwner, update);

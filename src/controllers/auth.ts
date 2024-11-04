@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { User } from '../usecases/user';
 import { authentication, random } from '../helpers/index';
 import asyncHandler from "../middlewares/async";
@@ -6,28 +6,21 @@ import { IUser } from '../models/users';
 import { ErrorResponse } from '../utils/errorResponse';
 import { loginUser, registerUser } from '../validators/user';
 
-export const register = asyncHandler(async (req: Request, res: Response) => {
-
-  console.log(req.body)
-
+export const register = asyncHandler(async (req: Request, res: Response, next: NextFunction ) => {
   const { error, value } = registerUser.validate(req.body);
 
-  if (error) {
-    throw new ErrorResponse("Email, password and username is required", 400);
-  }
+  if (error) return next(new ErrorResponse(error.details[0].message, 400));
+
 
   const { email, password, username } = value;
   
   const existingUser = await User.userByEmail(email);
   if (existingUser) {
-    console.log("User already exists")
     throw new ErrorResponse("User already exists", 400);
-    ;
   }
   // const salt = random();
   const user = await User.create(value);
-  return res.status(201).json(user);
-
+  return res.status(201).json({success: true, message: 'User created successfully', data: user});
 });
 
 

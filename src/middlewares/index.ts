@@ -12,7 +12,7 @@ declare module 'express' {
 
 export const isAuthenticated = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const authorizationHeader = req.headers['authorization'];
+    const authorizationHeader = req.headers.authorization;
     const sessionToken = authorizationHeader 
       ? authorizationHeader.split(" ")[1]  // Extract token from 'Bearer <token>'
       : req.cookies['token'];              // Fallback to cookie if header is absent
