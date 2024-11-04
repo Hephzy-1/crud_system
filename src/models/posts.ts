@@ -2,12 +2,17 @@ import { Document, Schema, model, Types } from 'mongoose';
 
 export interface IPost extends Document {
   title: string;
+  coverImage: string;
   post: string;
   userId: Types.ObjectId;
 }
 
 const postModel = new Schema<IPost>({
   title: {
+    type: String,
+    required: true
+  },
+  coverImage: {
     type: String,
     required: true
   },

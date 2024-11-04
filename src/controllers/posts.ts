@@ -5,28 +5,57 @@ import asyncHandler from '../middlewares/async';
 import { IPost } from "../models/posts";
 import { ErrorResponse } from "../utils/errorResponse";
 import { makePost, userPost, updatePost } from "../validators/post";
+import upload from '../utils/multer';
+import cloudinary from '../utils/cloudinary';
 
 export const createPost = asyncHandler(async (req: Request, res: Response) => {
   req.body.userId = req.user?._id;
-  console.log(req.body)
-  const { error, value } = makePost.validate(req.body);
 
-  if (error) {
-    throw new ErrorResponse("Title and post is required", 400);
+  if (!req.body.userId) {
+    throw new ErrorResponse("User ID is required", 400);
   }
+  
+  // Handle Multer upload with a Cloudinary upload for coverImage
+  upload.single('coverImage')(req, res, async (err) => {
+    if (err) throw new ErrorResponse(err.message, 500);
 
-  const { title, post } = value;
+    try {
+      // Validate and process the post input data
+      // const { error, value } = makePost.validate(req.body);
+      // if (error) {
+      //   throw new ErrorResponse("Title, cover image and post content are required", 400);
+      // }
 
-  value.userId = req.body.userId
+      // const { title, post } = value;
+      // value.userId = req.body.userId;
 
-  const user = User.userById(value.userId)
+      // Check if user exists
+      const user = await User.userById(req.body.userId);
+      if (!user) {
+        throw new ErrorResponse("User not found", 404);
+      }
 
-  if (!user) {
-    throw new ErrorResponse("User not found", 404);
-  }
+      // Upload image to Cloudinary and attach URL to the coverImage field
+      if (req.file) {
+        const uploadResult = cloudinary.uploader.upload_stream(
+          { resource_type: 'image' },
+          (cloudErr, result) => {
+            if (cloudErr) throw new ErrorResponse("Image upload failed", 500);
 
-  const blog = await Post.create(value);
-  return res.status(201).json({ Message: "Post has been created: ", blog})
+            req.body.coverImage = result?.secure_url; // Set Cloudinary URL as coverImage
+          }
+        );
+        uploadResult.end(req.file.buffer); // Pass file buffer to Cloudinary
+      }
+
+      // Create and save the post in MongoDB
+      const blog = await Post.create(req.body);
+      return res.status(201).json({ message: "Post created successfully", blog });
+
+    } catch (error:any) {
+      throw new ErrorResponse(error.message, 500);
+    }
+  });
 });
 
 export const getPostsByUserId = asyncHandler(async (req: Request, res: Response) => {

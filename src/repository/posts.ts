@@ -52,7 +52,7 @@ export class PostRepository {
         throw new ErrorResponse("Post not found", 404);
       }
 
-      return await Post.findOneAndUpdate({id}, update, { new: true }).exec();
+      return await Post.findOneAndUpdate({_id:id}, update, { new: true }).exec();
 
     } catch (error: any) {
       throw new ErrorResponse(error.message, 500);
