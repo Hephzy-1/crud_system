@@ -21,6 +21,17 @@ const userSchema = new mongoose.Schema<IUser>({
   post: [
     { type: Types.ObjectId, ref: 'post' }
   ]
+},
+  {
+  toJSON: {
+      transform: function (doc, ret) { 
+          delete ret.password;
+          delete ret.__v;
+          delete ret.createdAt;
+          delete ret.updatedAt;
+      }
+  },
+  timestamps: true,
 });
 
 const User = mongoose.model<IUser>('User', userSchema);
