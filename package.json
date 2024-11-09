@@ -9,6 +9,7 @@
   "author": "Hephzibah Ifeoluwa Owoeye",
   "license": "ISC",
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/body-parser": "^1.19.5",
     "@types/compression": "^1.7.5",
     "@types/cookie-parser": "^1.4.7",
@@ -17,6 +18,10 @@
     "@types/lodash": "^4.17.12",
     "@types/mongoose": "^5.11.96",
     "@types/multer": "^1.4.12",
+    "@types/passport": "^1.0.17",
+    "@types/passport-google-oauth2": "^0.1.10",
+    "@types/passport-google-oauth20": "^2.0.16",
+    "@types/passport-local": "^1.0.38",
     "lodash": "^4.17.21",
     "nodemon": "^3.1.7",
     "ts-node": "^10.9.2",
@@ -24,6 +29,7 @@
   },
   "dependencies": {
     "@types/node": "^22.7.6",
+    "bcrypt": "^5.1.1",
     "body-parser": "^1.20.3",
     "cloudinary": "^2.5.1",
     "compression": "^1.7.4",
@@ -31,8 +37,13 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
+    "express-session": "^1.18.1",
     "joi": "^17.13.3",
     "multer": "^1.4.5-lts.1",
+    "passport": "^0.7.0",
+    "passport-google-oauth2": "^0.2.0",
+    "passport-google-oauth20": "^2.0.0",
+    "passport-local": "^1.0.0",
     "sharp": "^0.33.5"
   }
 }

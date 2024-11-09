@@ -1,11 +1,12 @@
 import express, { Application, Request, Response } from 'express';
-import http from 'http';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import compression from 'compression';
 import mongoose from 'mongoose';
-import router from './router/index';
+import authRouter from './router/auth';
+import userRouter from './router/users';
+import postRouter from './router/post';
 import asyncHandler from './middlewares/async';
 import errorHandler from './middlewares/error';
 
@@ -18,11 +19,13 @@ app.use(bodyParser.json());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get('/', asyncHandler(async (req: Request, res: Response) => {
-  return res.status(200).json({ messgae: "Welcome"})
-}));
+app.get('/', (req:Request, res:Response) => {
+  return res.status(200).json({ message: "welcome"})
+});
 
-app.use('/api/v1', router);
+app.use('/api/v1', authRouter);
+app.use('/api/v1', userRouter);
+app.use('/api/v1', postRouter);
 
 // Error Handler
 app.use(errorHandler)

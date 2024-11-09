@@ -2,17 +2,20 @@ import { ErrorResponse } from '../utils/errorResponse';
 import User from '../models/users';
 import { IUser } from '../models/users';
 import { Types } from 'mongoose';
+import { hashPassword } from '../helpers';
 
 export class UserRepository {
   // create a new user
   static async createUser(values: IUser) {
     try {
+
+      const hash = values.password ? await hashPassword(values.password as string) : null;
+
       const user = await new User({
         username: values.username,
         email: values.email,
         role: values.role,
-        password: values.password,
-        salt: values.salt,
+        password: hash,
         sessionToken: values.sessionToken
       }).save();
       return user.toObject();

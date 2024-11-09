@@ -4,20 +4,23 @@ export interface IUser extends Document {
   username: string;
   email: string;
   role?: string;
-  password: string;
-  salt?: string;
+  password?: string;
+  salt?: number;
   sessionToken?: string;
   _id: string;
+  googleId?: string;
   post: Types.ObjectId[];
+  isModified: (field: string) => boolean;
 }
 
 const userSchema = new mongoose.Schema<IUser>({
   username: { type: String, required: true },
-  email: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
   role: { type: String, enum: ['user', 'admin'], default: 'user' },
-  password: { type: String, required: true, select: false },
-  salt: { type: String, select: false },
-  sessionToken: { type: String, select: false },
+  password: { type: String },
+  googleId: { type: String },
+  salt: { type: Number, default: 10 },
+  sessionToken: { type: String },
   post: [
     { type: Types.ObjectId, ref: 'post' }
   ]
