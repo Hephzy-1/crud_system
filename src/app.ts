@@ -1,9 +1,8 @@
-import express, { Application, Request, Response } from 'express';
+import express, { Application, Request, Response, NextFunction, ErrorRequestHandler } from 'express';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import compression from 'compression';
-import mongoose from 'mongoose';
 import authRouter from './router/auth';
 import userRouter from './router/users';
 import postRouter from './router/post';
@@ -19,15 +18,15 @@ app.use(bodyParser.json());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get('/', (req:Request, res:Response) => {
-  return res.status(200).json({ message: "welcome"})
-});
+// Fix: Properly type the route handler
+app.get('/', asyncHandler( async (req: Request, res: Response): Promise<void> => {
+  res.status(200).json({ message: "welcome" });
+}));
 
 app.use('/api/v1', authRouter);
 app.use('/api/v1', userRouter);
 app.use('/api/v1', postRouter);
 
-// Error Handler
-app.use(errorHandler)
+app.use(errorHandler);
 
 export default app;

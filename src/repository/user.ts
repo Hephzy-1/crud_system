@@ -1,102 +1,94 @@
+// repository/user.ts
 import { ErrorResponse } from '../utils/errorResponse';
 import User from '../models/users';
 import { IUser } from '../models/users';
 import { Types } from 'mongoose';
 import { hashPassword } from '../helpers';
 
-export class UserRepository {
-  // create a new user
-  static async createUser(values: IUser) {
-    try {
+interface CreateUserInput {
+  username: string;
+  email: string;
+  role?: 'user' | 'admin';
+  password?: string;
+  sessionToken?: string;
+  googleId?: string;
+}
 
-      const hash = values.password ? await hashPassword(values.password as string) : null;
+export class UserRepository {
+  static async createUser(values: CreateUserInput): Promise<IUser> {
+    try {
+      const hash = values.password ? await hashPassword(values.password) : undefined;
 
       const user = await new User({
-        username: values.username,
-        email: values.email,
-        role: values.role,
+        ...values,
         password: hash,
-        sessionToken: values.sessionToken
+        email: values.email.toLowerCase(),
       }).save();
+
       return user.toObject();
     } catch (error: any) {
-      throw new ErrorResponse(error.message, 500);
-    }
-  }
-  
-
-  // get all users
-  static async getUsers() {
-    try {
-      return await User.find().exec()
-    } catch (error:any) {
+      if (error.code === 11000) {
+        throw new ErrorResponse('Email already exists', 400);
+      }
       throw new ErrorResponse(error.message, 500);
     }
   }
 
-  // get a user by email
-  static async getUserByEmail(email:string) {
-    try {
-      return await User.findOne({ email }).select('+salt +password')
-    } catch (error:any) {
-      throw new ErrorResponse(error.message, 500)
-    }
+  static async getUsers(): Promise<IUser[]> {
+    return User.find().sort({ createdAt: -1 }).exec();
   }
 
-  // get user by user session token
+  static async getUserByEmail(email: string): Promise<IUser | null> {
+    return User.findOne({ email: email.toLowerCase() })
+      .select('+salt +password')
+      .exec();
+  }
+
   static async getUserBySessionToken(sessionToken: string): Promise<IUser | null> {
-    try {
-      return await User.findOne({ sessionToken : sessionToken })
-    } catch (error:any) {
-      throw new ErrorResponse(error.message, 500)
-    }
+    return User.findOne({ sessionToken }).exec();
   }
 
-  // get user by id
-  static async getUserById(id: string) {
-    try {
-      return await User.findById(id);
-    } catch (error:any) {
-      throw new ErrorResponse(error.message, 500)
+  static async getUserById(id: string): Promise<IUser | null> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new ErrorResponse('Invalid user ID', 400);
     }
+    return User.findById(id).exec();
   }
 
-  // update user details
-  static async updateUser(id: string, update: Partial<IUser>) {
-    try {
-      const user = await User.findById(id);
-      if (!user) {
-        throw new ErrorResponse("User not found", 404);
-      }
-      return await User.findByIdAndUpdate(id, update, { new: true }).exec();
-    } catch (error: any) {
-      throw new ErrorResponse(error.message, 500);
+  static async updateUser(id: string, update: Partial<IUser>): Promise<IUser | null> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new ErrorResponse('Invalid user ID', 400);
     }
-  }  
 
-  // add post id to user
-  static async updateUserPost(id: Types.ObjectId, postId: string) {
-    try {
-      const user = await User.findById(id);
-      if (!user) {
-        throw new ErrorResponse("User not found", 404);
-      }
-  
-      // Add the new post ID to the user's post array
-      const pushPost = await user.updateOne({ post: postId});
-  
-      return pushPost;
-    } catch (error: any) {
-      throw new ErrorResponse(error.message, 500);
-    }
-  }  
+    // Remove sensitive fields from update
+    const sanitizedUpdate = { ...update };
+    delete sanitizedUpdate.password;
+    delete sanitizedUpdate.salt;
 
-  // delete a user
-  static async deleteUser(id: string) {
-    try {
-      return await User.findOneAndDelete({_id: id})
-    } catch (error:any) {
-      throw new ErrorResponse(error.message, 500)
+    return User.findByIdAndUpdate(
+      id,
+      { $set: sanitizedUpdate },
+      { new: true, runValidators: true }
+    ).exec();
+  }
+
+  static async updateUserPosts(userId: Types.ObjectId, postId: string): Promise<boolean> {
+    if (!Types.ObjectId.isValid(postId)) {
+      throw new ErrorResponse('Invalid post ID', 400);
     }
+
+    const result = await User.updateOne(
+      { _id: userId },
+      { $addToSet: { posts: postId } }  // Use addToSet to prevent duplicates
+    );
+
+    return result.modifiedCount > 0;
+  }
+
+  static async deleteUser(id: string): Promise<IUser | null> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new ErrorResponse('Invalid user ID', 400);
+    }
+    return User.findByIdAndDelete(id).exec();
   }
 }
