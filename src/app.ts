@@ -19,9 +19,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Fix: Properly type the route handler
-app.get('/', asyncHandler( async (req: Request, res: Response): Promise<void> => {
+app.get('/', (req: Request, res: Response): Promise<void> => {
   res.status(200).json({ message: "welcome" });
-}));
+});
 
 app.use('/api/v1', authRouter);
 app.use('/api/v1', userRouter);
@@ -30,3 +30,6 @@ app.use('/api/v1', postRouter);
 app.use(errorHandler);
 
 export default app;
+
+// Redis ( update catch when new db is updated )
+// Learn db management/optimization

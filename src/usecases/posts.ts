@@ -19,7 +19,7 @@ export class Post {
       // create the post with the user ids
       post.userId = userId;
       const newPost = await PostRepository.createPost(post);
-      await UserRepository.updateUserPost(userId, newPost._id as unknown as string);
+      await UserRepository.updateUserPosts(userId, newPost._id as unknown as string);
   
       return newPost;
     } catch (error: any) {
