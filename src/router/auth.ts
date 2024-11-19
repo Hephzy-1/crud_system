@@ -1,12 +1,11 @@
 // routes/auth.ts
-import express from 'express';
+import { Router } from 'express';
 import { register, login, oAuth } from '../controllers/auth';
 import passport from 'passport';
-import asyncHandler from '../middlewares/async';
 
-const router = express.Router();
+const router = Router();
 
-router.post('/auth/register', register);
+router.post('/register', register);
 router.post('/auth/login', login);
 
 router.get('/google', passport.authenticate('google', { 

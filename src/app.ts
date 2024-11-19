@@ -1,4 +1,4 @@
-import express, { Application, Request, Response, NextFunction, ErrorRequestHandler } from 'express';
+import express, { Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -8,8 +8,10 @@ import userRouter from './router/users';
 import postRouter from './router/post';
 import asyncHandler from './middlewares/async';
 import errorHandler from './middlewares/error';
+import redis from 'redis';
 
-const app: Application = express();
+const app = express();
+const redisClient = redis.createClient();
 
 app.use(cors({ credentials: true }));
 app.use(compression());
@@ -18,14 +20,22 @@ app.use(bodyParser.json());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Fix: Properly type the route handler
-app.get('/', (req: Request, res: Response): Promise<void> => {
-  res.status(200).json({ message: "welcome" });
+// Handle Redis connection errors
+redisClient.on('error', (err) => {
+  console.error('Redis error:', err);
 });
 
-app.use('/api/v1', authRouter);
-app.use('/api/v1', userRouter);
-app.use('/api/v1', postRouter);
+// Connect to Redis
+redisClient.connect().catch(console.error);
+
+// Fix: Properly type the route handler
+// app.get('/', (req: Request, res: Response) => {
+//   return res.status(200).json({ message: "welcome" });
+// });
+
+app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/users', userRouter);
+app.use('/api/v1/posts', postRouter);
 
 app.use(errorHandler);
 

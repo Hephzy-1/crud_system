@@ -1,14 +1,15 @@
 // controllers/auth.ts
-import { NextFunction, Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { User } from '../usecases/user';
+import { IUser } from '../models/users';
 import { comparePassword, authentication } from '../helpers/index';
 import asyncHandler from "../middlewares/async";
 import passport from 'passport';
 import { ErrorResponse } from '../utils/errorResponse';
-import { loginUser, registerUser } from '../validators/user';
+import { loginUser , registerUser  } from '../validators/user';
 
 export const register = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-  const { error, value } = registerUser.validate(req.body);
+  const { error, value } = registerUser .validate(req.body);
   if (error) {
     return next(new ErrorResponse(error.details[0].message, 400));
   }
@@ -22,20 +23,20 @@ export const register = asyncHandler(async (req: Request, res: Response, next: N
 
   res.status(201).json({
     success: true,
-    message: 'User created successfully',
+    message: 'User  created successfully',
     data: userData
   });
 });
 
 export const login = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-  const { error, value } = loginUser.validate(req.body);
+  const { error, value } = loginUser .validate(req.body);
   if (error) {
     return next(new ErrorResponse(error.details[0].message, 400));
   }
 
   const { email, password } = value;
 
-  const user = await User.userByEmail(email);
+  const user = await User.userByEmail(email) as IUser;
   if (!user || !user.password) {
     return next(new ErrorResponse('Invalid credentials', 401));
   }
